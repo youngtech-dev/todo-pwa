@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block title %}My Lists{% endblock %}
+
+{% block head %}
+<style>
+    .lists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .list-card {
+        background: white;
+        border: 1.5px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: 4px 4px 0 var(--line);
+        overflow: hidden;
+        transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .list-card:hover {
+        box-shadow: 6px 6px 0 var(--amber);
+        transform: translate(-1px, -1px);
+    }
+
+    .list-card-header {
+        background: var(--ink);
+        color: var(--paper);
+        padding: 0.9rem 1.2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .list-card-title {
+        font-family: 'Playfair Display', serif;
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: -0.01em;
+    }
+
+    .list-meta {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.65rem;
+        color: var(--muted);
+        letter-spacing: 0.06em;
+    }
+
+    .list-delete-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: rgba(255,255,255,0.4);
+        font-size: 1rem;
+        line-height: 1;
+        padding: 0 0 0 0.5rem;
+        transition: color 0.15s;
+    }
+    .list-delete-btn:hover { color: #e57373; }
+
+    .task-list { padding: 0.5rem 0; }
+
+    .task-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.6rem 1.2rem;
+        border-bottom: 1px solid var(--paper-dark);
+        transition: background 0.12s;
+    }
+    .task-item:last-child { border-bottom: none; }
+    .task-item:hover { background: var(--paper); }
+
+    .task-check {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+        border: 1.5px solid var(--line);
+        border-radius: 50%;
+        background: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: border-color 0.15s, background 0.15s;
+        position: relative;
+    }
+    .task-check:hover { border-color: var(--amber); }
+    .task-check.done {
+        background: var(--green);
+        border-color: var(--green);
+    }
+    .task-check.done::after {
+        content: '';
+        width: 6px;
+        height: 4px;
+        border-left: 2px solid white;
+        border-bottom: 2px solid white;
+        transform: rotate(-45deg) translateY(-1px);
+        display: block;
+    }
+
+    .task-body { flex: 1; min-width: 0; }
+
+    .task-body:hover {
+        color: var(--amber);
+        cursor: pointer;
+    }
+
+    .task-title {
+        font-size: 0.88rem;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .task-title.done {
+        text-decoration: line-through;
+        color: var(--muted);
+    }
+
+    .task-date {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.62rem;
+        color: var(--muted);
+        margin-top: 1px;
+    }
+
+    .task-actions {
+        display: flex;
+        gap: 0.25rem;
+        opacity: 0;
+        transition: opacity 0.15s;
+    }
+    .task-item:hover .task-actions { opacity: 1; }
+
+    .icon-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px 6px;
+        border-radius: var(--radius);
+        font-size: 0.8rem;
+        color: var(--muted);
+        text-decoration: none;
+        transition: background 0.12s, color 0.12s;
+    }
+    .icon-btn:hover { background: var(--paper-dark); color: var(--ink); }
+    .icon-btn.danger:hover { background: #fde8e8; color: var(--red); }
+
+    .list-footer {
+        padding: 0.75rem 1.2rem;
+        border-top: 1px dashed var(--line);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.3;
+    }
+    .empty-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .empty-text {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-bottom: 1.5rem;
+    }
+
+    .tag-complete {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.6rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 20px;
+        background: #e8f5ee;
+        color: var(--green);
+        border: 1px solid #b8ddc8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header animate-in">
+    <h1 class="page-title">My Lists</h1>
+    {% if lists %}
+    <span class="page-subtitle">{{ lists|length }} list{% if lists|length != 1 %}s{% endif %}</span>
+    {% endif %}
+</div>
+
+{% if lists %}
+<div class="lists-grid">
+    {% for lst in lists %}
+    <div class="list-card animate-in delay-{{ loop.index if loop.index <= 4 else 4 }}">
+        <div class="list-card-header">
+            <span class="list-card-title">{{ lst.title }}</span>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <span class="list-meta">{{ lst.tasks|length }} task{% if lst.tasks|length != 1 %}s{% endif %}</span>
+                <form method="POST" action="{{ url_for('delete_list', list_id=lst.id) }}" style="display:inline;" onsubmit="return confirm('Delete this list and all its tasks?')">
+                    <input type="hidden" name="_method" value="DELETE">
+                    <button type="submit" class="list-delete-btn" title="Delete list">✕</button>
+                </form>
+            </div>
+        </div>
+
+        {% if lst.tasks %}
+        <div class="task-list">
+            {% for task in lst.tasks %}
+            <div class="task-item">
+                <form method="POST" action="{{ url_for('complete_task', task_id=task.id) }}" style="display:contents;">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <button type="submit" class="task-check {% if task.completed %}done{% endif %}" title="Mark complete"></button>
+                </form>
+                <a href="{{ url_for('task', task_id=task.id) }}" class="task-body" style="text-decoration: none; color: inherit;">
+                    <div class="task-title {% if task.completed %}done{% endif %}">{{ task.title }}</div>
+                    <div class="task-date">{{ task.date_created.strftime('%d %b %Y') }}</div>
+                </a>
+                {% if task.completed %}
+                <span class="tag-complete">Done</span>
+                {% else %}
+                <div class="task-actions">
+                    <a href="{{ url_for('edit_task', task_id=task.id) }}" class="icon-btn" title="Edit">✎</a>
+                    <form method="POST" action="{{ url_for('delete_task', task_id=task.id) }}" style="display:inline;" onsubmit="return confirm('Delete this task?')">
+                        <input type="hidden" name="_method" value="DELETE">
+                        <button type="submit" class="icon-btn danger" title="Delete">✕</button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="padding:1.2rem;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted);">No tasks yet.</div>
+        {% endif %}
+
+        <div class="list-footer">
+            <a href="{{ url_for('new_task') }}" class="btn btn-outline" style="font-size:0.65rem;padding:6px 14px;">+ Add Task</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="empty-state animate-in">
+    <div class="empty-icon">📋</div>
+    <h2 class="empty-title">Nothing here yet.</h2>
+    <p class="empty-text">Create your first list to get started.</p>
+    <a href="{{ url_for('new_list') }}" class="btn btn-primary">Create a List</a>
+</div>
+{% endif %}
+{% endblock %}

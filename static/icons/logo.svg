@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <style>
+      .ink { fill: #111111; }
+      .paper { fill: #ffffff; }
+      .green { fill: #10b981; }
+      .muted { fill: #a0a0a0; }
+      .amber { fill: #ffb300; }
+      .stroke-ink { stroke: #111111; stroke-width: 12; }
+      .stroke-ink-thin { stroke: #111111; stroke-width: 6; }
+    </style>
+  </defs>
+
+  <rect x="136" y="136" width="260" height="260" rx="16" class="ink" />
+
+  <rect x="108" y="108" width="260" height="260" rx="16" class="paper stroke-ink" />
+
+  <path d="M 108 124 A 16 16 0 0 1 124 108 L 352 108 A 16 16 0 0 1 368 124 L 368 176 L 108 176 Z" class="ink" />
+
+  <rect x="132" y="134" width="90" height="16" rx="4" class="paper" />
+  <circle cx="340" cy="142" r="6" class="paper" opacity="0.5" />
+
+  <circle cx="156" cy="224" r="20" class="paper stroke-ink-thin" />
+  <rect x="196" y="216" width="130" height="14" rx="4" class="ink" />
+
+  <circle cx="156" cy="288" r="20" class="green stroke-ink-thin" />
+  <path d="M 146 288 L 154 296 L 168 280" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <rect x="196" y="280" width="90" height="14" rx="4" class="muted" />
+  <line x1="190" y1="287" x2="292" y2="287" stroke="#111111" stroke-width="3" /> <circle cx="340" cy="336" r="10" class="amber stroke-ink-thin" />
+</svg>
